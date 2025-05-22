@@ -13,11 +13,6 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "task_reminder")
 public class TaskReminder {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "id", insertable=false, updatable=false)
-    private String id;
-
     @Column(name = "task_id", insertable=false, updatable=false)
     private String taskId;
 
@@ -30,6 +25,6 @@ public class TaskReminder {
 
     @Column(name = "reminder_time" , nullable = false)
     private String reminderTime;
-    
-   
+
+
 }
