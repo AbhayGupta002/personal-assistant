@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +16,12 @@ import lombok.AllArgsConstructor;
 @Table(name = "task_details")
 public class TaskDetails {
     @Id
-    @Column(name = "task_id")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", insertable=false, updatable=false)
+    private String id;
+
+    @Column(name = "task_id", unique = true)
     private String taskId;
 
     @OneToOne(mappedBy = "taskDetails", cascade = CascadeType.ALL)
@@ -21,10 +30,10 @@ public class TaskDetails {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "task_name", nullable = false)
+    @Column(name = "task_name", nullable = false, insertable = true, updatable = true)
     private String taskName;
 
-    @Column(name = "date_time")
+    @Column(name = "date_time", insertable = true, updatable = true)
     private String dateTime;
 
     @Column(name = "created_at")
