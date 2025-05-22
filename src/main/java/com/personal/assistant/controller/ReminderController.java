@@ -47,4 +47,51 @@ public class ReminderController {
         return task;
     }
     
+     @GetMapping(value = "get")
+    public TaskDto getTask(@RequestBody TaskDto taskDto){
+        TaskDetails taskDetails = taskRepo.findByTaskAndUserId(taskDto.getTaskId(), taskDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("task not existing"+taskDto.getTaskId()));
+        TaskReminder taskReminder = reminderRepo.findByTaskId(taskDto.getTaskId())
+                .orElseThrow(() -> new RuntimeException("task not existing"+taskDto.getTaskId()));
+        TaskDto task = new TaskDto();
+        task.setTaskId(taskDetails.getTaskId());
+        task.setUserId(taskDetails.getUserId());
+        task.setTaskName(taskDetails.getTaskName());
+        task.setDateTime(taskDetails.getDateTime());
+        task.setCreatedAt(taskDetails.getCreatedAt());
+        task.setTaskCompleted(taskDetails.isTaskCompleted());
+        task.setTaskStatus(Status.valueOf(taskDetails.getTaskStatus()));
+        taskReminder.setReminderTime(taskReminder.getReminderTime());
+        return task;
+
+    }
+
+    @PutMapping(value = "update")
+    public TaskDto updateTask(@RequestBody TaskDto taskDto) {
+        TaskDetails taskDetails = taskRepo.findByTaskAndUserId(taskDto.getTaskId(), taskDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("task not existing"+taskDto.getTaskId()));
+        TaskReminder taskReminder = reminderRepo.findByTaskId(taskDto.getTaskId())
+                .orElseThrow(() -> new RuntimeException("task not existing"+taskDto.getTaskId()));
+        taskDetails.setTaskName(taskDto.getTaskName());
+        taskDetails.setDateTime(taskDto.getDateTime());
+        taskDetails.setTaskStatus(Status.ACTIVE.name());
+        taskDetails.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        taskDetails.setTaskCompleted(false);
+        TaskDetails savedTask = taskRepo.save(taskDetails);
+
+        taskReminder.setReminderTime(taskDto.getReminderTime());
+        taskReminder.setTaskId(savedTask.getTaskId());
+        TaskReminder savedReminder = reminderRepo.save(taskReminder);
+
+        taskDto.setTaskId(savedTask.getTaskId());
+        taskDto.setTaskStatus(Status.valueOf(savedTask.getTaskStatus()));
+        taskDto.setCreatedAt(savedTask.getCreatedAt());
+        taskDto.setTaskCompleted(savedTask.isTaskCompleted());
+        taskDto.setReminderTime(savedReminder.getReminderTime());
+
+        return taskDto;
+
+}
+
+    
 }
